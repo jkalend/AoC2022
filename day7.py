@@ -2,10 +2,9 @@ import requests
 import treelib as tree
 
 class registry:
-    def __init__(self, dir_ = False, file_ = False, name = '', size = 0):
+    def __init__(self, dir_ = False, file_ = False, size = 0):
         self.dir_ = dir_
         self.file_ = file_
-        self.name = name
         self.size = size
 
 
@@ -15,6 +14,7 @@ if __name__ == '__main__':
     buffer = tree.Tree()
     buffer.create_node("/", "/", data=registry(dir_=True))
     current = buffer.get_node("/")
+
     for line in arr:
         if line.startswith('$'):
             if line.split(" ")[1] == 'cd':
@@ -24,7 +24,6 @@ if __name__ == '__main__':
                 elif line.split(" ")[2] == '/':
                     current = buffer.get_node("/")
                 else:
-                    print(line.split(" ")[2])
                     current = buffer.get_node(current.identifier + "/" + (line.split(" ")[2]))
             elif line.split(" ")[1] == 'ls':
                 continue
@@ -33,16 +32,17 @@ if __name__ == '__main__':
                 if buffer.get_node((line.split(" ")[1])) is not None:
                     continue
                 buffer.create_node(line.split(" ")[1], current.identifier + "/" + line.split(" ")[1],
-                                   data=registry(file_=True, size=int(line.split(' ')[0]), name=line.split(" ")[1]),
+                                   data=registry(file_=True, size=int(line.split(' ')[0])),
                                    parent=current.identifier)
 
             elif line.split(' ')[0] == "dir":
                 if buffer.get_node((line.split(" ")[1])) is not None:
                     continue
                 buffer.create_node(line.split(" ")[1], current.identifier + "/" + line.split(" ")[1],
-                                   data=registry(dir_=True, name=line.split(" ")[1]),
+                                   data=registry(dir_=True),
                                    parent=current.identifier)
 
+    # DFS pretty much
     for i in buffer.all_nodes().__reversed__():
         if buffer.parent(i.identifier) is not None:
             buffer.parent(i.identifier).data.size += i.data.size
